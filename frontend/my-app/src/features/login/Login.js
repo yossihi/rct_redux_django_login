@@ -10,6 +10,7 @@ import {
   unsecureAsync,
 } from "./loginSlice";
 import { jwtDecode } from "jwt-decode";
+import { Link } from "react-router-dom";
 
 export function Login() {
   const [username, setUsername] = useState("");
@@ -94,7 +95,8 @@ export function Login() {
       </form>
       <h3>{msg}</h3>
       <br />
-      <br />
+      {(logged)? <Link className="btn btn-success" to={'/products'}>My Products</Link> : ""}
+      <br /><br/>
       <div>
         <button
           className="btn btn-success"
