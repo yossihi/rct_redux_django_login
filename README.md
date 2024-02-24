@@ -17,6 +17,7 @@ This project is a full-stack web application built with React, Redux, and Django
 - User registration
 - User login with authentication using JWT (JSON Web Tokens).
 - Protected routes that require authentication.
+- Product CRUD (Create, Read, Update, Delete) operations.
 
 ## Technologies Used
 
@@ -73,6 +74,7 @@ This project is a full-stack web application built with React, Redux, and Django
 1. Access the application at http://localhost:3000 in your browser.
 2. Register a new account or log in with existing credentials.
 3. Explore the authenticated sections of the application.
+4. Navigate to the Product section to perform CRUD operations.
 
 # Contributing
     Feel free to contribute by opening issues or submitting pull requests. Follow the CONTRIBUTING.md guidelines.

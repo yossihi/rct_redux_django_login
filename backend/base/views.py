@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import serializers
-from .models import Product
+from .models import Order, Product
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -32,6 +32,13 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.desc = validate_data.get('desc', instance.desc)
         instance.save()
         return instance
+    
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'
+    def create(self, validated_data):
+        return Order.objects.create(**validated_data)
     
 
 
@@ -87,3 +94,48 @@ def products(req,id=-1):
         old_task = Product.objects.get(id=id)
         ser.update(old_task, req.data)
         return Response('updated')
+    
+@api_view(['post'])
+@permission_classes([IsAuthenticated])
+def buyProd(req, id):
+    try:
+        temp_prod=Product.objects.get(id=id)
+    except Product.DoesNotExist:
+        return Response ("not found")
+    new_order = OrderSerializer(data={'product': temp_prod.id, 'customer': req.user.id})
+    if new_order.is_valid():
+        new_order.save()
+        return Response('buyed')
+    else:
+        return Response(new_order.errors)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getCart(req):
+    all_prods = OrderSerializer(Order.objects.filter(customer=req.user.id), many=True).data
+    all_orders = []
+    for order in all_prods:
+        prod_order = Product.objects.get(id=order['product'])
+        existing_order = next((item for item in all_orders if item["desc"] == prod_order.desc), None)
+        if existing_order:
+            existing_order["quantity"] += 1
+        else:
+            all_orders.append({
+                "id": prod_order.id,
+                "desc": prod_order.desc,
+                "price": prod_order.price,
+                "quantity": 1
+            })
+    return Response(all_orders)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def unBuy(req, id):
+    
+    try:
+        temp_prod=Order.objects.filter(product=id, customer=req.user).first()
+    except Order.DoesNotExist:
+        return Response ("not found")
+    
+    temp_prod.delete()
+    return Response('unbuyed')

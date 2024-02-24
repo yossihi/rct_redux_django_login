@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { addProd, updProd, loadData, deleteProd } from "./prodAPI";
+import { addProd, updProd, loadData, deleteProd, buyProd } from "./prodAPI";
 
 const initialState = {
   loggedIn: sessionStorage.getItem("access") ? true : false,
@@ -31,11 +31,18 @@ export const addProdAsync = createAsyncThunk(
 export const updProdAsync = createAsyncThunk(
   "products/updProd",
   async (myData) => {
-    console.log(myData);
     const response = await updProd(myData.prodID, myData.formData);
     return response.data;
   }
 );
+
+export const buyProdAsync = createAsyncThunk(
+  "products/buyProd",
+  async (prodID) => {
+    const response = await buyProd(prodID)
+    return response.data
+  }
+)
 
 export const loginSlice = createSlice({
   name: "prod",
